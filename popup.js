@@ -114,8 +114,9 @@ function showAlert(givenName) {
 let init = false
 injectFunction.addEventListener('click', async () => {
 	const tab = await getCurrentTab();
-	if (init == false) {
-		const url = document.getElementById('4x4url').value
+  const url = document.getElementById('4x4url').value
+  await chrome.storage.local.set({ url })
+	if (false && init == false) {
 		await chrome.storage.local.set({ url })
 		await chrome.scripting.executeScript({
 			target: { tabId: tab.id },

@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener(({message, data, sender}) => {
     return
   }
   if (sender == "content" && message == "leaderboard") {
+    let url = data.url + path
     const form_data = new URLSearchParams();
     const leaderboard = data.leaderboard
     form_data.append('data', JSON.stringify(leaderboard));
