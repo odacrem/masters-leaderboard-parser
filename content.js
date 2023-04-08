@@ -1,4 +1,5 @@
 let Extension = {status:"stopped"}
+
 const parseLeaderboard = function() {
   let data = []
   let players_e = document.getElementsByClassName('playerRow')
@@ -67,7 +68,7 @@ Extension.run = function() {
   let leaderboard = parseLeaderboard()
   let data = {
 		url,
-    leaderboard
+    leaderboard,
   }
   chrome.runtime.sendMessage({message:"leaderboard", data, sender:"content"})
 }
@@ -86,46 +87,57 @@ Extension.start = function() {
 }
 
 chrome.runtime.onMessage.addListener(({message, sender, data}) => {
+	console.log("message:" + message)
   if (message == "stop") {
     Extension.stop(data.interval)
   }
   if (message == "start") {
     Extension.start()
   }
+	if (message == "fetchStart") {
+		Extension.button.setAttribute("disabled", true)
+		Extension.button.textContent = "updating..."
+	}
+	if (message == "fetchComplete") {
+		Extension.button.removeAttribute("disabled")
+	  let content = Extension.status == "running" ? "Stop" : "Start"
+		Extension.button.textContent = content
+	}
 })
 
-setInterval(function() {
-  console.log("Extension:" + Extension.status + ":" + Extension.interval)
-},5000)
+Extension.setup = function() {
+	const div = document.createElement('div');
+	const input = document.createElement('input');
+	input.setAttribute("type","text")
+	input.value = "http://localhost:3000"
+	input.setAttribute("id","url")
+	const button = document.createElement('button');
+	button.textContent = 'Start';
+	button.setAttribute("id", "button")
+	// add an event listener to the button
+	button.addEventListener('click', () => {
+		if (Extension.interval) {
+			Extension.stop()
+		} else {
+			Extension.start()
+		}
+	});
+	div.appendChild(input)
+	div.appendChild(button)
 
-const div = document.createElement('div');
+	// set the position and top/left CSS properties
+	div.style.position = 'fixed';
+	div.style.top = '10px';
+	div.style.left = '10px';
+	div.style.zIndex = 1000;
+	div.style.backgroundColor = "white"
+	div.style.padding = "10px"
+	div.style.border = "1px solid black"
 
-const input = document.createElement('input');
-input.setAttribute("type","text")
-input.value = "http://localhost:3000"
-input.setAttribute("id","url")
 
-const button = document.createElement('button');
-button.textContent = 'Start';
-button.setAttribute("id", "button")
+	// append the button to the body of the page
+	document.body.appendChild(div);
+	Extension.button = button
+}
 
-// add an event listener to the button
-button.addEventListener('click', () => {
-	if (Extension.interval) {
-		Extension.stop()
-	} else {
-		Extension.start()
-	}
-});
-div.appendChild(input)
-div.appendChild(button)
-
-// set the position and top/left CSS properties
-div.style.position = 'fixed';
-div.style.top = '10px';
-div.style.left = '10px';
-div.style.zIndex = 1000;
-
-// append the button to the body of the page
-document.body.appendChild(div);
-Extension.button = button
+Extension.setup()
