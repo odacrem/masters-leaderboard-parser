@@ -13,13 +13,11 @@ const parseLeaderboard = function() {
    let player_name = player_e.getElementsByClassName('playerName')[0].lastChild.innerText.toLowerCase();
    player_name = player_name.replace("(a)","")
    player_name  = player_name.trim()
-   switch (player_name) {
-    case "lee, m.w." :
-      //player_name = ""
-     break;
-
+   let back_nine = false
+   if (player_name.indexOf('*') != -1) {
+     back_nine = true
    }
-   //console.warn(player_name)
+   player_name = player_name.replace("*","")
    let player_data = {name:player_name, scores:[],thru:0}
    let prior = player_e.getElementsByClassName('prior')[0].firstChild
    if (prior.getAttribute("class") == "data under") {
@@ -31,23 +29,34 @@ const parseLeaderboard = function() {
    }
    let last = prior
    let index = 0
-   for (const score_e of player_e.getElementsByClassName('score')) {
+   let thru = 0
+   let scores = Array.from(player_e.getElementsByClassName('score'))
+   let sequence = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
+   if (back_nine) {
+		sequence = [9,10,11,12,13,14,15,16,17,0,1,2,3,4,5,6,7,8]
+   }
+   for (const s of sequence) {
+     let score_e = scores[s]
+      if (score_e == undefined || score_e == null) {
+				continue
+      }
      let ou = score_e.firstChild.innerText
-     let par = pars[index]
+     let par = pars[s]
      index++
      if (ou == null || ou == undefined || ou == "") {
-      continue
+       player_data.scores[s] = null
+     } else {
+       ou = parseInt(ou)
+       if (score_e.firstChild.getAttribute("class") == "data under") {
+        ou = 0 - ou
+       } else if (score_e.firstChild.getAttribute("class") == "data over") {
+         ou = 0 + ou
+       }
+       let diff = -1 * (prior - ou)
+       player_data.thru = s
+       prior = ou
+       player_data.scores[s] = (par + diff)
      }
-     ou = parseInt(ou)
-     if (score_e.firstChild.getAttribute("class") == "data under") {
-      ou = 0 - ou
-     } else if (score_e.firstChild.getAttribute("class") == "data over") {
-       ou = 0 + ou
-     }
-     let diff = -1 * (prior - ou)
-     player_data.thru = index
-     prior = ou
-     player_data.scores.push(par + diff)
    }
    data.push(player_data)
   }
