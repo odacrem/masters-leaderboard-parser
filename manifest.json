@@ -1,0 +1,15 @@
+{
+  "name": "4x4 Masters",
+  "description": "Extension To Parse Golf Scores",
+  "version": "1.0",
+  "manifest_version": 3,
+	"permissions": ["scripting", "activeTab", "storage"],
+	"host_permissions" :  ["http://localhost:3000/", "https://4x4fantasygolf.com/"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "hello.html",
+    "default_icon": "favicon-16x16.png"
+  }
+}
