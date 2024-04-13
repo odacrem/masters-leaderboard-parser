@@ -1,4 +1,4 @@
-let path = "/admin/tournaments/90/raw"
+let path = "/admin/tournaments/350/raw"
 let url = ""
 chrome.runtime.onMessage.addListener(({message, data, sender}, message_sender) => {
   console.log(sender + ":" + message)
