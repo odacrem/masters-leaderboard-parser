@@ -25,6 +25,7 @@ chrome.runtime.onMessage.addListener(({message, data, sender}, message_sender) =
       console.log("done");
     })
     .catch(error => {
+			chrome.tabs.sendMessage(tab_id, {message:"fetchError", sender:"background"})
       console.error('Error:', error);
     });
   }
